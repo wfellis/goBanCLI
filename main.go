@@ -90,12 +90,20 @@ func New() *Model {
 // helper functions
 // move to next
 func (m *Model) MoveToNext() tea.Msg {
-	selectedItem := m.lists[m.focused].SelectedItem()
-	selectedTask := selectedItem.(Task)
-	m.lists[selectedTask.status].RemoveItem(m.lists[m.focused].Index())
-	selectedTask.Next()
-	m.lists[selectedTask.status].InsertItem(len(m.lists[selectedTask.status].Items())-1, list.Item(selectedTask))
-	return nil
+	//TODO if the list is null this errors out
+	testVal := len(m.lists[m.focused].Items()) - 1
+	if testVal >= 0 {
+		selectedItem := m.lists[m.focused].SelectedItem()
+		selectedTask := selectedItem.(Task)
+
+		m.lists[selectedTask.status].RemoveItem(m.lists[m.focused].Index())
+		selectedTask.Next()
+		m.lists[selectedTask.status].InsertItem(len(m.lists[selectedTask.status].Items())-1, list.Item(selectedTask))
+
+		return nil
+	} else {
+		return nil
+	}
 }
 
 //next list
@@ -167,7 +175,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "right", "l":
 			m.Next()
 		case "enter":
-			//TODO if the list is null this errors out
 			return m, m.MoveToNext
 		case "n":
 			models[model] = m // save the state of the current model
@@ -214,7 +221,6 @@ func (m Model) View() string {
 				columnStyle.Render(doneView),
 			)
 		}
-
 	} else {
 		return "loading..."
 	}
